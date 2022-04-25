@@ -12,6 +12,7 @@
 		09792D6B2816F09E0050B811 /* Core_Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 09792D692816F09E0050B811 /* Core_Data.xcdatamodeld */; };
 		09792D6D2816F0A00050B811 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 09792D6C2816F0A00050B811 /* Assets.xcassets */; };
 		09792D702816F0A00050B811 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 09792D6E2816F0A00050B811 /* LaunchScreen.storyboard */; };
+		09792D78281701FB0050B811 /* TaskVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09792D77281701FB0050B811 /* TaskVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		09792D6C2816F0A00050B811 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		09792D6F2816F0A00050B811 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		09792D712816F0A00050B811 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		09792D77281701FB0050B811 /* TaskVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 			children = (
 				09792D602816F09E0050B811 /* AppDelegate.swift */,
 				09792D642816F09E0050B811 /* TaskListViewController.swift */,
+				09792D77281701FB0050B811 /* TaskVC.swift */,
 				09792D6C2816F0A00050B811 /* Assets.xcassets */,
 				09792D6E2816F0A00050B811 /* LaunchScreen.storyboard */,
 				09792D712816F0A00050B811 /* Info.plist */,
@@ -137,6 +140,7 @@
 				09792D6B2816F09E0050B811 /* Core_Data.xcdatamodeld in Sources */,
 				09792D652816F09E0050B811 /* TaskListViewController.swift in Sources */,
 				09792D612816F09E0050B811 /* AppDelegate.swift in Sources */,
+				09792D78281701FB0050B811 /* TaskVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
