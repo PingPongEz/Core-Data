@@ -12,9 +12,7 @@ import CoreData
 
 class TaskViewController: UIViewController {
     
-    var delegate: TableViewReload?
-    
-    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    private let context = StorageMenager.shared.persistentContainer.viewContext
     
     private lazy var textField: UITextField = {
         let textField = UITextField()
@@ -103,7 +101,6 @@ class TaskViewController: UIViewController {
                 print(error)
             }
         }
-        delegate?.reloadData()
         dismiss(animated: true)
     }
     
