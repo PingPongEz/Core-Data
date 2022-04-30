@@ -26,13 +26,15 @@ class TaskListViewController: UITableViewController, NSFetchedResultsControllerD
         setupNavigationBar()
         
         let request: NSFetchRequest<Task> = Task.fetchRequest()
-        let sortDesc = NSSortDescriptor(key: "index", ascending: true)
+        let sortDesc = NSSortDescriptor(key: "createdDate", ascending: true)
         
         request.sortDescriptors = [sortDesc]
         
         fetchController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
         
-        fetchData()
+        fetchController.delegate = self
+        
+        reloadData()
         
         self.navigationItem.leftBarButtonItem = self.editButtonItem
     }
@@ -69,22 +71,16 @@ class TaskListViewController: UITableViewController, NSFetchedResultsControllerD
         showAlert(with: "Add new task", and: "Any plans?")
     }
     
-        private func fetchData() {
-            do {
-                try fetchController.performFetch()
-            } catch {
-                print(2)
-            }
+    private func fetchData() {
+        do {
+            try fetchController.performFetch()
+        } catch {
+            print(2)
         }
+    }
 }
 
-
-
 extension TaskListViewController {
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        fetchController.sections?.count ?? 0
-    }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let section = fetchController.sections?[section]
@@ -97,15 +93,27 @@ extension TaskListViewController {
         
         let task = fetchController.object(at: indexPath)
         cell.textLabel?.text = task.titleOfTask
-        cell.detailTextLabel?.text = "\(task.index)"
         
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        let taskToEdit = fetchController.object(at: indexPath)
         
+        tableView.deselectRow(at: indexPath, animated: true)
         
+        let request: NSFetchRequest<Task> = Task.fetchRequest()
+        guard let title = taskToEdit.titleOfTask else { return }
+        
+        request.predicate = NSPredicate(format: "titleOfTask = %@", title)
+        
+        do {
+            let obj = try context.fetch(request).last
+            saveEdit(object: obj)
+        } catch {
+            print(error)
+        }
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -113,15 +121,19 @@ extension TaskListViewController {
         case .delete:
             let taskToDelete = fetchController.object(at: indexPath)
             context.delete(taskToDelete)
-            reloadData()
         default: break
         }
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        guard let indexPath = indexPath else { return }
+
         switch type {
         case .delete:
-            tableView.deleteRows(at: [indexPath!], with: .automatic)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        case .update:
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+            StorageMenager.shared.saveContext()
         default: break
         }
     }
@@ -141,7 +153,8 @@ extension TaskListViewController {
             guard let task = alert.textFields?.first?.text, !task.isEmpty else { return }
             self.save(task)
         }
-        let cancelAct = UIAlertAction(title: "Cancel", style: .destructive)
+        let cancelAct = UIAlertAction(title: "Cancel", style: .default)
+        
         alert.addAction(saveAct)
         alert.addAction(cancelAct)
         alert.addTextField { textField in
@@ -152,23 +165,43 @@ extension TaskListViewController {
     
     
     private func save(_ taskName: String) {
-        let task = Task(context: StorageMenager.shared.persistentContainer.viewContext)
-        task.titleOfTask = taskName
-        task.index = Int16(fetchController.sections?.count ?? 0)
         
-        print(task)
-        StorageMenager.shared.saveContext()
+        let task = Task(context: context)
+        task.titleOfTask = taskName
+        task.createdDate = Date()
+        
+        print(task.createdDate as Any)
         
         let section = fetchController.sections?[0]
         
         let index = IndexPath(row: section?.numberOfObjects ?? 0, section: 0)
+        
         fetchData()
         
         tableView.insertRows(at: [index], with: .automatic)
+        
+        StorageMenager.shared.saveContext()
     }
     
     
-    private func saveEdit(_ task: String) {
+    private func saveEdit(object: NSManagedObject?) {
+        guard let object = object as? Task else { return }
         
+        let alert = UIAlertController(title: "edit", message: "", preferredStyle: .alert)
+        
+        let alOk = UIAlertAction(title: "Save", style: .default) { _ in
+            object.titleOfTask = alert.textFields?.first?.text
+            
+        }
+        
+        let cancel = UIAlertAction(title: "Cancel", style: .default)
+        
+        alert.addTextField { tf in
+            tf.text = object.titleOfTask
+        }
+        
+        alert.addAction(alOk)
+        alert.addAction(cancel)
+        present(alert, animated: true)
     }
 }
