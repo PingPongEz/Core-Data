@@ -82,6 +82,18 @@ class TaskListViewController: UITableViewController, NSFetchedResultsControllerD
 
 extension TaskListViewController {
     
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        true
+    }
+    
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        
+        let sourceCell = fetchController.object(at: sourceIndexPath)
+        let destinationCell = fetchController.object(at: destinationIndexPath)
+        
+        
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let section = fetchController.sections?[section]
         
@@ -133,6 +145,8 @@ extension TaskListViewController {
             tableView.deleteRows(at: [indexPath], with: .automatic)
         case .update:
             tableView.reloadRows(at: [indexPath], with: .automatic)
+        case .move:
+            tableView.moveRow(at: indexPath, to: newIndexPath!)
             StorageMenager.shared.saveContext()
         default: break
         }
