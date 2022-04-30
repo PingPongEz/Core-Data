@@ -26,7 +26,7 @@ class TaskListViewController: UITableViewController, NSFetchedResultsControllerD
         setupNavigationBar()
         
         let request: NSFetchRequest<Task> = Task.fetchRequest()
-        let sortDesc = NSSortDescriptor(key: "createdDate", ascending: true)
+        let sortDesc = NSSortDescriptor(key: "numberOfTask", ascending: true)
         
         request.sortDescriptors = [sortDesc]
         
@@ -89,7 +89,13 @@ extension TaskListViewController {
     override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         
         let sourceCell = fetchController.object(at: sourceIndexPath)
+        
+        let changingValue = sourceCell.numberOfTask
+        
         let destinationCell = fetchController.object(at: destinationIndexPath)
+        
+        sourceCell.numberOfTask = destinationCell.numberOfTask
+        destinationCell.numberOfTask = changingValue
         
         
     }
@@ -120,12 +126,8 @@ extension TaskListViewController {
         
         request.predicate = NSPredicate(format: "titleOfTask = %@", title)
         
-        do {
-            let obj = try context.fetch(request).last
-            saveEdit(object: obj)
-        } catch {
-            print(error)
-        }
+        saveEdit(object: fetchController.object(at: indexPath))
+        
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -184,17 +186,22 @@ extension TaskListViewController {
         task.titleOfTask = taskName
         task.createdDate = Date()
         
+        guard let lastID = fetchController.fetchedObjects?.last?.numberOfTask else { return }
+        
+        task.numberOfTask = Int16(lastID + 1)
+        print(task.numberOfTask)
         print(task.createdDate as Any)
         
         let section = fetchController.sections?[0]
         
         let index = IndexPath(row: section?.numberOfObjects ?? 0, section: 0)
         
+        StorageMenager.shared.saveContext()
+        
         fetchData()
         
         tableView.insertRows(at: [index], with: .automatic)
         
-        StorageMenager.shared.saveContext()
     }
     
     
